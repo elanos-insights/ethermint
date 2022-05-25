@@ -87,7 +87,8 @@ func NewEthAccountVerificationDecorator(ak evmtypes.AccountKeeper, ek EVMKeeper)
 // - from address is empty
 // - account balance is lower than the transaction cost
 func (avd EthAccountVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	if !ctx.IsCheckTx() {
+	x := true
+	if x {
 		return next(ctx, tx, simulate)
 	}
 
@@ -121,9 +122,9 @@ func (avd EthAccountVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx
 				"the sender is not EOA: address %s, codeHash <%s>", fromAddr, acct.CodeHash)
 		}
 
-		//if err := evmkeeper.CheckSenderBalance(sdk.NewIntFromBigInt(acct.Balance), txData); err != nil {
-		//	return ctx, sdkerrors.Wrap(err, "failed to check sender balance")
-		//}
+		if err := evmkeeper.CheckSenderBalance(sdk.NewIntFromBigInt(acct.Balance), txData); err != nil {
+			return ctx, sdkerrors.Wrap(err, "failed to check sender balance")
+		}
 
 	}
 	return next(ctx, tx, simulate)
